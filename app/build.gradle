@@ -1,0 +1,48 @@
+apply plugin: 'com.android.application'
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion "26.0.3"
+    defaultConfig {
+        applicationId "de.Maxr1998.gallery_selector"
+        minSdkVersion 19
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    compile "com.android.support:support-v4:27.0.2"
+}
+
+def propFile = project.file("keyStore.properties")
+if (propFile.exists()) {
+    Properties props = new Properties()
+    props.load(new FileInputStream(propFile))
+    def main = android.signingConfigs.create("main")
+    main.storeFile project.file(props["keyStore"])
+    main.storePassword props["keyStorePassword"]
+    main.keyAlias props["keyAlias"]
+    main.keyPassword props["keyPassword"]
+
+    android.buildTypes.release.signingConfig = main
+    android.buildTypes.debug.signingConfig = main
+
+    ext.crowdinKey = props["crowdinKey"]
+}
